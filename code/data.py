@@ -16,7 +16,7 @@ class DRP(object):
         ''' Class object that describes the DRP data set 
 
         '''
-        self.fits_file = Ut.Dir_dat()+'drpall-v2_0_1.fits'              # fits file
+        self.fits_file = Ut.Dir_dat()+'drp/drpall-v2_0_1.fits'              # fits file
         self.hdf5_file = (self.fits_file).split('.fits')[0]+'.hdf5'     # hdf5 file 
 
         self.nsa_grp = None 

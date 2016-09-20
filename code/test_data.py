@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 # --- Local ---
 import util as Ut
 import data as Data
+import sfr as SFR
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
@@ -83,11 +84,67 @@ def DRP_NSA(prop, prop_spec=None):
         sub.set_ylabel(r'$\mathtt{M_{*}^{'+prop_spec+'}}$', fontsize=25) 
         fig_file += 'NSA_'+prop_spec.upper()+'mass_of_z.png'
         fig.savefig(fig_file, bbox_inches='tight') 
+
+    elif prop == 'mass vs uvsfr': # M* versus SFRs
+        derp.Preprocess() 
+        nsa_data = derp.nsa_data
     
+        if prop_spec == 'petro': 
+            uv_sfr = SFR.DRP_UVsfr(nsa_data, 'elpetro')
+            mass = np.log10(nsa_data['elpetro_mass'])
+        elif prop_spec == 'sersic': 
+            uv_sfr = SFR.DRP_UVsfr(nsa_data, 'sersic')
+            mass = np.log10(nsa_data['sersic_mass'])
+        else: 
+            raise ValueError
+
+        tots = np.where((mass > 0.) & (uv_sfr > 0.))
+
+        fig = plt.figure() 
+        sub = fig.add_subplot(111)
+        sub.scatter(mass, np.log10(uv_sfr), c='k', s=10) 
+        sub.text(8.5, 2.,str(len(tots[0]))+' galaxies',  fontsize=20)
+        # axes
+        sub.set_ylim([-3., 3.]) 
+        sub.set_yticks([-3, -2, -1, 0, 1, 2, 3])
+        sub.set_ylabel(r'log $\mathtt{SFR_{UV}}$', fontsize=25) 
+        sub.set_xlim([8.0, 12.0]) 
+        sub.set_xticks([8, 9, 10, 11, 12])
+        sub.minorticks_on()
+        sub.set_xlabel(r'log $\mathtt{M_{*}^{'+prop_spec+'}}$', fontsize=25) 
+        fig_file += 'NSA_'+prop_spec.upper()+'mass_vs_UVsfr.png'
+        fig.savefig(fig_file, bbox_inches='tight') 
+    
+    elif prop == 'mass vs Nr': # M* versus SFRs
+        derp.Preprocess() 
+        nsa_data = derp.nsa_data
+    
+        if prop_spec == 'petro': 
+            Nr = SFR.DRP_Nr(nsa_data, 'elpetro')
+            mass = np.log10(nsa_data['elpetro_mass'])
+        elif prop_spec == 'sersic': 
+            Nr = SFR.DRP_Nr(nsa_data, 'sersic')
+            mass = np.log10(nsa_data['sersic_mass'])
+        else: 
+            raise ValueError
+
+        fig = plt.figure() 
+        sub = fig.add_subplot(111)
+        sub.scatter(mass, Nr, c='k', s=10) 
+        # axes
+        sub.set_xlim([8.0, 12.0]) 
+        sub.set_xticks([8, 9, 10, 11, 12])
+        sub.set_ylim([0., 8.]) 
+        #sub.set_yticks([-3, -2, -1, 0, 1, 2, 3])
+        sub.set_ylabel(r'N - r', fontsize=25) 
+        sub.minorticks_on()
+        sub.set_xlabel(r'log $\mathtt{M_{*}^{'+prop_spec+'}}$', fontsize=25) 
+        fig_file += 'NSA_'+prop_spec.upper()+'mass_vs_Nr.png'
+        fig.savefig(fig_file, bbox_inches='tight') 
     return None
 
 
 
 if __name__=='__main__': 
-    DRP_NSA('mass(z)', prop_spec='petro')
-    DRP_NSA('mass(z)', prop_spec='sersic')
+    DRP_NSA('mass vs uvsfr', prop_spec='petro')
+    DRP_NSA('mass vs Nr', prop_spec='petro')

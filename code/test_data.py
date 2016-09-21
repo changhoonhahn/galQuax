@@ -18,7 +18,7 @@ def DRP_NSA(prop, prop_spec=None):
     '''
     '''
     prettyplot()    # plotting pretty
-    pretty_color = prettycolors() 
+    pretty_colors = prettycolors() 
     fig_file = Ut.Dir_fig() 
     # import DRP object
     derp = Data.DRP() 
@@ -88,13 +88,22 @@ def DRP_NSA(prop, prop_spec=None):
     elif prop == 'mass vs uvsfr': # M* versus SFRs
         derp.Preprocess() 
         nsa_data = derp.nsa_data
+        
+        # NSA catalog 
+        nseh = Data.NSA() 
+        nseh.Read() 
+        nseh.Preprocess() 
     
         if prop_spec == 'petro': 
             uv_sfr = SFR.DRP_UVsfr(nsa_data, 'elpetro')
             mass = np.log10(nsa_data['elpetro_mass'])
+            uv_sfr_nsa = SFR.DRP_UVsfr(nseh.nsa_data, 'elpetro')
+            mass_nsa = np.log10(nseh.nsa_data['elpetro_mass'])
         elif prop_spec == 'sersic': 
             uv_sfr = SFR.DRP_UVsfr(nsa_data, 'sersic')
             mass = np.log10(nsa_data['sersic_mass'])
+            uv_sfr_nsa = SFR.DRP_UVsfr(nseh.nsa_data, 'sersic')
+            mass_nsa = np.log10(nseh.nsa_data['sersic_mass'])
         else: 
             raise ValueError
 
@@ -102,7 +111,8 @@ def DRP_NSA(prop, prop_spec=None):
 
         fig = plt.figure() 
         sub = fig.add_subplot(111)
-        sub.scatter(mass, np.log10(uv_sfr), c='k', s=10) 
+        sub.scatter(mass_nsa, np.log10(uv_sfr_nsa), c='k', s=5) 
+        sub.scatter(mass, np.log10(uv_sfr), c=pretty_colors[3], lw=0, s=10) 
         sub.text(8.5, 2.,str(len(tots[0]))+' galaxies',  fontsize=20)
         # axes
         sub.set_ylim([-3., 3.]) 
@@ -117,20 +127,30 @@ def DRP_NSA(prop, prop_spec=None):
     
     elif prop == 'mass vs Nr': # M* versus SFRs
         derp.Preprocess() 
-        nsa_data = derp.nsa_data
+        nsa_data = derp.nsa_data    # nsa data of manga catalog
+
+        # NSA catalog 
+        nseh = Data.NSA() 
+        nseh.Read() 
+        nseh.Preprocess() 
     
         if prop_spec == 'petro': 
             Nr = SFR.DRP_Nr(nsa_data, 'elpetro')
             mass = np.log10(nsa_data['elpetro_mass'])
+            Nr_nsa = SFR.DRP_Nr(nseh.nsa_data, 'elpetro')
+            mass_nsa = np.log10(nseh.nsa_data['elpetro_mass'])
         elif prop_spec == 'sersic': 
             Nr = SFR.DRP_Nr(nsa_data, 'sersic')
             mass = np.log10(nsa_data['sersic_mass'])
+            Nr_nsa = SFR.DRP_Nr(nseh.nsa_data, 'sersic')
+            mass_nsa = np.log10(nseh.nsa_data['sersic_mass'])
         else: 
             raise ValueError
 
         fig = plt.figure() 
         sub = fig.add_subplot(111)
-        sub.scatter(mass, Nr, c='k', s=10) 
+        sub.scatter(mass_nsa, Nr_nsa, c='k', s=5) 
+        sub.scatter(mass, Nr, c=pretty_colors[3], lw=0, s=10) 
         # axes
         sub.set_xlim([8.0, 12.0]) 
         sub.set_xticks([8, 9, 10, 11, 12])
